@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, ExternalLink, X, ChevronDown } from 'lucide-react';
 import { UssdDialogState, SmsReceiptState } from '../types';
 import { phoneSound } from '../utils/audio';
+import { sendDeviceNotification, requestNotificationPermission } from '../utils/notifications';
 
 interface UssdDialogProps {
   isRunning: boolean;
@@ -26,13 +27,14 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const isRtl = lang === 'ar';
 
-  // Reset and focus input when dialog opens
+  // Request system notification permission when USSD opens so real phone notification is allowed
   useEffect(() => {
     if (dialogState?.isOpen) {
+      requestNotificationPermission();
       setInputVal(dialogState.inputValue || '');
       setTimeout(() => {
         inputRef.current?.focus();
-      }, 60);
+      }, 70);
     }
   }, [dialogState]);
 
@@ -43,15 +45,18 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
     setInputVal('');
   };
 
-  // Play notification sound when SMS arrives and setup auto-dismiss
+  // Play notification tone, vibrate phone, and fire REAL NATIVE PHONE NOTIFICATION
   useEffect(() => {
     if (smsReceipt && smsReceipt.isOpen) {
       phoneSound.playNotificationTone();
 
-      // Auto dismiss notification after 9 seconds if not dismissed manually
+      // Trigger REAL OS / Phone Notification on user's device
+      sendDeviceNotification(smsReceipt.sender, smsReceipt.body, smsReceipt.url);
+
+      // Auto dismiss on-screen banner after 8 seconds
       const timer = setTimeout(() => {
         onCloseReceipt();
-      }, 9000);
+      }, 8000);
 
       return () => clearTimeout(timer);
     }
@@ -62,7 +67,7 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
       {/* 1. "USSD code running..." Toast at bottom (Exact replica of frame 01:05 & 01:14!) */}
       {isRunning && (
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-50 flex items-end justify-center pb-20 px-6 animate-fade-in pointer-events-auto">
-          <div className="bg-zinc-900/95 border border-zinc-700/70 text-zinc-100 px-5 py-2.5 rounded-full flex items-center gap-3 shadow-2xl">
+          <div className="bg-[#1f2023] border border-zinc-700/60 text-zinc-100 px-5 py-2.5 rounded-full flex items-center gap-3 shadow-2xl">
             <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
             <span className="text-xs font-medium font-sans">
               USSD code running...
@@ -71,23 +76,22 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
         </div>
       )}
 
-      {/* 2. Authentic Android System USSD Dialog (Exact Match from video 01:07!)
-             User types the password with their own hand directly into the input */}
+      {/* 2. Authentic Android System USSD Dialog (Exact Match from video frame 01:07!) */}
       {dialogState && dialogState.isOpen && (
         <div className="absolute inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in select-none">
           <div
-            className="w-full max-w-[325px] bg-[#222326] border border-zinc-700/60 rounded-2xl shadow-2xl p-5 text-white flex flex-col"
+            className="w-full max-w-[320px] bg-[#202124] border border-[#323438] rounded-3xl shadow-2xl p-5 text-white flex flex-col"
             dir="ltr"
           >
             {/* Message text inside dialog */}
             <div
-              className="text-[13.5px] leading-relaxed whitespace-pre-line text-zinc-100 font-normal pb-3 text-start"
+              className="text-[14px] leading-relaxed whitespace-pre-line text-zinc-100 font-sans pb-3 text-start"
               dir={isRtl ? 'rtl' : 'ltr'}
             >
               {dialogState.message}
             </div>
 
-            {/* Natural Input field - user types with their hand/keyboard */}
+            {/* Input field - user types password directly with phone keyboard or PC */}
             {dialogState.inputPrompt && (
               <form onSubmit={handleSubmit} className="w-full mt-1 mb-4">
                 <input
@@ -98,7 +102,7 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   placeholder={isRtl ? 'أدخل الرقم السري' : 'Enter PIN'}
-                  className="w-full bg-transparent border-b border-zinc-500/80 focus:border-emerald-400 py-1.5 px-1 text-base text-white focus:outline-none placeholder-zinc-500 font-mono tracking-widest transition-colors"
+                  className="w-full bg-transparent border-b-2 border-zinc-500/80 focus:border-emerald-400 py-1.5 px-1 text-base text-white focus:outline-none placeholder-zinc-500 font-mono tracking-widest transition-colors"
                   dir="ltr"
                 />
               </form>
@@ -143,7 +147,7 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
         </div>
       )}
 
-      {/* 3. Authentic Android Heads-Up Push Notification Card (Exact match of frame 01:17 in video!) */}
+      {/* 3. Authentic Android Heads-Up Push Notification Card (Frame 01:17 in video!) */}
       {smsReceipt && smsReceipt.isOpen && (
         <div
           className="fixed top-2.5 left-2.5 right-2.5 max-w-[370px] mx-auto z-50 animate-slide-down select-none pointer-events-auto"

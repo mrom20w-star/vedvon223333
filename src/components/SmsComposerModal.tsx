@@ -42,7 +42,7 @@ export const SmsComposerModal: React.FC<SmsComposerModalProps> = ({
     e.preventDefault();
     if (!message.trim()) return;
 
-    phoneSound.playSuccessChime();
+    phoneSound.playNotificationTone();
     setIsSent(true);
 
     setTimeout(() => {

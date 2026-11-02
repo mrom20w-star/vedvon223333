@@ -12,6 +12,7 @@ import { PhoneShell } from './components/PhoneShell';
 import { INITIAL_CONTACTS, INITIAL_CALL_LOGS } from './data/initialContacts';
 import { Contact, CallLog, TabType, UssdDialogState, SmsReceiptState } from './types';
 import { parseAndExecuteUssd, handleUssdNextStep } from './utils/ussdEngine';
+import { requestNotificationPermission } from './utils/notifications';
 
 export default function App() {
   const [lang, setLang] = useState<'ar' | 'en'>('ar');
@@ -75,6 +76,7 @@ export default function App() {
 
   // Handle Placing a Call
   const handleInitiateCall = (rawNumber: string, sim: 'Vodafone' | 'Orange EG') => {
+    requestNotificationPermission();
     const num = rawNumber.trim();
     if (!num) return;
 

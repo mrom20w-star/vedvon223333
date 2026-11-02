@@ -95,7 +95,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
 
   return (
     <div className="flex flex-col flex-1 justify-between px-6 pb-6 pt-6 select-none max-w-md mx-auto w-full">
-      {/* Top Number Display Area (Matches frame 00:00 - 00:04!) */}
+      {/* Top Number Display Area */}
       <div className="flex flex-col items-center justify-center min-h-[115px] w-full shrink-0">
         <div className="relative w-full flex items-center justify-center min-h-[52px] mb-2">
           {dialedNumber ? (
@@ -131,45 +131,47 @@ export const Dialpad: React.FC<DialpadProps> = ({
           )}
         </div>
 
-        {/* 3 Quick Action Buttons beneath dialed number (Clean outline icons matching frame 00:03!) */}
-        {dialedNumber.length > 0 ? (
-          <div className="flex items-center justify-center gap-8 sm:gap-10 mt-1 text-zinc-300 w-full animate-fade-in">
-            {/* 1. Create new contact */}
-            <button
-              onClick={() => onCreateContact(dialedNumber)}
-              className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
-            >
-              <UserPlus className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[1.7]" />
-              <span className="text-[10px] sm:text-[11px] font-normal text-zinc-300 group-hover:text-white">
-                Create new contact
-              </span>
-            </button>
+        {/* The 3 Action Buttons: Create Contact, Save Existing, Send Message (ALWAYS VISIBLE as requested!) */}
+        <div className="flex items-center justify-center gap-7 sm:gap-9 mt-1 text-zinc-300 w-full">
+          {/* 1. Create new contact */}
+          <button
+            onClick={() => onCreateContact(dialedNumber)}
+            className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-300 group-hover:text-white bg-zinc-900/80 group-hover:bg-zinc-800 border border-zinc-800/80 transition-colors shadow-xs">
+              <UserPlus className="w-4 h-4 stroke-[1.8]" />
+            </div>
+            <span className="text-[10.5px] sm:text-[11px] font-normal text-zinc-400 group-hover:text-zinc-200">
+              {isRtl ? 'إنشاء جهة اتصال' : 'Create new contact'}
+            </span>
+          </button>
 
-            {/* 2. Save to existing */}
-            <button
-              onClick={() => onSaveToExisting(dialedNumber)}
-              className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
-            >
-              <UserCheck className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[1.7]" />
-              <span className="text-[10px] sm:text-[11px] font-normal text-zinc-300 group-hover:text-white">
-                Save to existing
-              </span>
-            </button>
+          {/* 2. Save to existing */}
+          <button
+            onClick={() => onSaveToExisting(dialedNumber)}
+            className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-300 group-hover:text-white bg-zinc-900/80 group-hover:bg-zinc-800 border border-zinc-800/80 transition-colors shadow-xs">
+              <UserCheck className="w-4 h-4 stroke-[1.8]" />
+            </div>
+            <span className="text-[10.5px] sm:text-[11px] font-normal text-zinc-400 group-hover:text-zinc-200">
+              {isRtl ? 'إضافة لحالي' : 'Save to existing'}
+            </span>
+          </button>
 
-            {/* 3. Send message */}
-            <button
-              onClick={() => onSendMessage(dialedNumber)}
-              className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
-            >
-              <MessageSquare className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[1.7]" />
-              <span className="text-[10px] sm:text-[11px] font-normal text-zinc-300 group-hover:text-white">
-                Send message
-              </span>
-            </button>
-          </div>
-        ) : (
-          <div className="h-10" />
-        )}
+          {/* 3. Send message (بتاع الرسائل المطلوب) */}
+          <button
+            onClick={() => onSendMessage(dialedNumber)}
+            className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-300 group-hover:text-white bg-zinc-900/80 group-hover:bg-zinc-800 border border-zinc-800/80 transition-colors shadow-xs">
+              <MessageSquare className="w-4 h-4 stroke-[1.8]" />
+            </div>
+            <span className="text-[10.5px] sm:text-[11px] font-normal text-zinc-400 group-hover:text-zinc-200">
+              {isRtl ? 'إرسال رسالة' : 'Send message'}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Dialpad 3x4 Grid - Lowered gracefully towards bottom call buttons (Exact match frame 00:03!) */}

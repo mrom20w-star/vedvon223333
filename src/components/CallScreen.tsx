@@ -126,7 +126,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({
           {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((k) => (
             <button
               key={k}
-              onClick={() => phoneSound.playDtmf(k, 120)}
+              onClick={() => phoneSound.playDtmf(k)}
               className="py-2 text-center text-lg font-light text-white hover:bg-zinc-800 rounded-lg active:scale-90 transition-all cursor-pointer"
             >
               {k}
