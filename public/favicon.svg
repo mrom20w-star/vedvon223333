@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="cashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="120" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="116" fill="none" stroke="#334155" stroke-width="8" opacity="0.6" />
+
+  <!-- Contacts Book / Profile Card Icon -->
+  <g transform="translate(100, 90)">
+    <!-- Base card -->
+    <rect width="312" height="332" rx="36" fill="#1e293b" stroke="#475569" stroke-width="6" />
+
+    <!-- Binder tabs on left -->
+    <rect x="-12" y="48" width="24" height="18" rx="6" fill="#64748b" />
+    <rect x="-12" y="112" width="24" height="18" rx="6" fill="#64748b" />
+    <rect x="-12" y="176" width="24" height="18" rx="6" fill="#64748b" />
+    <rect x="-12" y="240" width="24" height="18" rx="6" fill="#64748b" />
+
+    <!-- Avatar Circle -->
+    <circle cx="156" cy="110" r="48" fill="#3b82f6" />
+    <!-- Avatar Head -->
+    <circle cx="156" cy="98" r="20" fill="#ffffff" />
+    <!-- Avatar Body -->
+    <path d="M126 144 C126 126, 186 126, 186 144 Z" fill="#ffffff" />
+
+    <!-- Contact Name & Details lines -->
+    <rect x="76" y="180" width="160" height="12" rx="6" fill="#94a3b8" />
+    <rect x="96" y="206" width="120" height="10" rx="5" fill="#64748b" />
+  </g>
+
+  <!-- Floating Green Phone Call Badge -->
+  <g transform="translate(70, 290)">
+    <circle cx="65" cy="65" r="55" fill="url(#phoneGrad)" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))" />
+    <!-- Handset icon -->
+    <path d="M50 48 c4 0 8 3 9 8 l3 9 c1 3 0 6 -2 8 l-4 4 c5 10 12 17 22 22 l4 -4 c2 -2 5 -3 8 -2 l9 3 c5 1 8 5 8 9 v8 c0 5 -4 9 -9 9 C72 120 40 88 40 57 c0 -5 4 -9 10 -9 z" fill="#ffffff" />
+  </g>
+
+  <!-- Floating Red Cash Transfer Badge -->
+  <g transform="translate(300, 290)">
+    <circle cx="65" cy="65" r="55" fill="url(#cashGrad)" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))" />
+    <!-- Transfer Arrows & Currency symbol -->
+    <path d="M46 62 l14 -14 v8 h24 v12 h-24 v8 z" fill="#ffffff" />
+    <path d="M84 76 l-14 14 v-8 h-24 v-12 h24 v-8 z" fill="#ffffff" opacity="0.9" />
+  </g>
+</svg>
