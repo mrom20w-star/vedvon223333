@@ -45,7 +45,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const numberScrollRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll dialed number container to the right (end) on new input so it never wraps
+  // Auto-scroll dialed number container to the right (end) so new digits stay visible
   useEffect(() => {
     if (numberScrollRef.current) {
       numberScrollRef.current.scrollLeft = numberScrollRef.current.scrollWidth;
@@ -85,7 +85,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
 
   const isRtl = lang === 'ar';
 
-  // Dynamic font size: keeps digits strictly in ONE single horizontal line, never breaking into two lines
+  // Dynamic font size: keeps digits strictly in ONE single horizontal line
   const getFontSize = () => {
     if (dialedNumber.length > 22) return 'text-xl';
     if (dialedNumber.length > 16) return 'text-2xl';
@@ -94,20 +94,20 @@ export const Dialpad: React.FC<DialpadProps> = ({
   };
 
   return (
-    <div className="flex flex-col flex-1 justify-between px-6 pb-6 pt-8 select-none max-w-md mx-auto w-full">
-      {/* Top Number Display Area */}
-      <div className="flex flex-col items-center justify-center min-h-[120px] w-full shrink-0">
-        <div className="relative w-full flex items-center justify-center min-h-[56px] mb-2">
+    <div className="flex flex-col flex-1 justify-between px-6 pb-6 pt-6 select-none max-w-md mx-auto w-full">
+      {/* Top Number Display Area (Matches frame 00:00 - 00:04!) */}
+      <div className="flex flex-col items-center justify-center min-h-[115px] w-full shrink-0">
+        <div className="relative w-full flex items-center justify-center min-h-[52px] mb-2">
           {dialedNumber ? (
             <div className="w-full flex items-center justify-center relative">
-              {/* Strictly ONE line (whitespace-nowrap) with smooth horizontal auto-scroll */}
+              {/* Strictly ONE line (whitespace-nowrap) */}
               <div
                 ref={numberScrollRef}
                 className="w-full text-center px-12 overflow-x-auto no-scrollbar scroll-smooth"
                 dir="ltr"
               >
                 <span
-                  className={`text-white font-light tracking-wider inline-block whitespace-nowrap ${getFontSize()}`}
+                  className={`text-white font-light tracking-wide inline-block whitespace-nowrap ${getFontSize()}`}
                 >
                   {dialedNumber}
                 </span>
@@ -123,63 +123,59 @@ export const Dialpad: React.FC<DialpadProps> = ({
                 title={isRtl ? 'حذف (اضغط مطولاً للمسح بالكامل)' : 'Backspace (hold to clear)'}
                 className="absolute right-0 p-2 text-zinc-400 hover:text-white active:scale-90 transition-transform cursor-pointer shrink-0 z-10"
               >
-                <Delete className="w-7 h-7 stroke-[1.8]" />
+                <Delete className="w-6 h-6 stroke-[1.8]" />
               </button>
             </div>
           ) : (
-            <span className="text-zinc-600 text-sm font-medium tracking-wide">
-              {isRtl ? 'اطلب رقماً أو كود USSD...' : 'Enter number or USSD code...'}
-            </span>
+            <div className="h-8" />
           )}
         </div>
 
-        {/* 3 Quick Action Buttons beneath the dialed number (ALWAYS VISIBLE as in video!) */}
-        <div className="flex items-center justify-center gap-7 sm:gap-9 mt-2 text-zinc-300 w-full">
-          {/* 1. Create new contact */}
-          <button
-            onClick={() => onCreateContact(dialedNumber)}
-            className="flex flex-col items-center gap-1 group cursor-pointer hover:text-white transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-300 group-hover:text-white bg-zinc-900/60 group-hover:bg-zinc-800 transition-colors">
-              <UserPlus className="w-4 h-4 stroke-[1.8]" />
-            </div>
-            <span className="text-[11px] font-normal text-zinc-400 group-hover:text-zinc-200">
-              {isRtl ? 'إنشاء جهة اتصال' : 'Create new contact'}
-            </span>
-          </button>
+        {/* 3 Quick Action Buttons beneath dialed number (Clean outline icons matching frame 00:03!) */}
+        {dialedNumber.length > 0 ? (
+          <div className="flex items-center justify-center gap-8 sm:gap-10 mt-1 text-zinc-300 w-full animate-fade-in">
+            {/* 1. Create new contact */}
+            <button
+              onClick={() => onCreateContact(dialedNumber)}
+              className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
+            >
+              <UserPlus className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[1.7]" />
+              <span className="text-[10px] sm:text-[11px] font-normal text-zinc-300 group-hover:text-white">
+                Create new contact
+              </span>
+            </button>
 
-          {/* 2. Save to existing */}
-          <button
-            onClick={() => onSaveToExisting(dialedNumber)}
-            className="flex flex-col items-center gap-1 group cursor-pointer hover:text-white transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-300 group-hover:text-white bg-zinc-900/60 group-hover:bg-zinc-800 transition-colors">
-              <UserCheck className="w-4 h-4 stroke-[1.8]" />
-            </div>
-            <span className="text-[11px] font-normal text-zinc-400 group-hover:text-zinc-200">
-              {isRtl ? 'إضافة لحالي' : 'Save to existing'}
-            </span>
-          </button>
+            {/* 2. Save to existing */}
+            <button
+              onClick={() => onSaveToExisting(dialedNumber)}
+              className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
+            >
+              <UserCheck className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[1.7]" />
+              <span className="text-[10px] sm:text-[11px] font-normal text-zinc-300 group-hover:text-white">
+                Save to existing
+              </span>
+            </button>
 
-          {/* 3. Send message */}
-          <button
-            onClick={() => onSendMessage(dialedNumber)}
-            className="flex flex-col items-center gap-1 group cursor-pointer hover:text-white transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-300 group-hover:text-white bg-zinc-900/60 group-hover:bg-zinc-800 transition-colors">
-              <MessageSquare className="w-4 h-4 stroke-[1.8]" />
-            </div>
-            <span className="text-[11px] font-normal text-zinc-400 group-hover:text-zinc-200">
-              {isRtl ? 'إرسال رسالة' : 'Send message'}
-            </span>
-          </button>
-        </div>
+            {/* 3. Send message */}
+            <button
+              onClick={() => onSendMessage(dialedNumber)}
+              className="flex flex-col items-center gap-1.5 group cursor-pointer hover:text-white transition-colors"
+            >
+              <MessageSquare className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[1.7]" />
+              <span className="text-[10px] sm:text-[11px] font-normal text-zinc-300 group-hover:text-white">
+                Send message
+              </span>
+            </button>
+          </div>
+        ) : (
+          <div className="h-10" />
+        )}
       </div>
 
-      {/* Dialpad 3x4 Grid - LOWERED DOWN (نزله سنة) towards call buttons, strictly LTR (1 on left, 3 on right) */}
+      {/* Dialpad 3x4 Grid - Lowered gracefully towards bottom call buttons (Exact match frame 00:03!) */}
       <div
         dir="ltr"
-        className="grid grid-cols-3 gap-y-4 gap-x-6 sm:gap-x-8 max-w-[340px] sm:max-w-[360px] mx-auto w-full mt-auto mb-2"
+        className="grid grid-cols-3 gap-y-4 gap-x-6 sm:gap-x-8 max-w-[340px] sm:max-w-[360px] mx-auto w-full mt-auto mb-3"
       >
         {BUTTONS.map((item) => {
           const isZero = item.digit === '0';
@@ -196,7 +192,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
               onMouseUp={isZero ? handleZeroMouseUp : undefined}
               onTouchStart={isZero ? handleZeroMouseDown : undefined}
               onTouchEnd={isZero ? handleZeroMouseUp : undefined}
-              className="group relative flex flex-col items-center justify-center h-16 sm:h-18 rounded-full bg-zinc-900/70 hover:bg-zinc-800 active:bg-zinc-700/80 transition-all duration-150 cursor-pointer shadow-sm active:scale-95"
+              className="group relative flex flex-col items-center justify-center h-16 sm:h-18 rounded-full bg-zinc-900/60 hover:bg-zinc-800 active:bg-zinc-700/80 transition-all duration-150 cursor-pointer shadow-sm active:scale-95"
             >
               <span className="text-2xl sm:text-3xl font-light text-zinc-100 group-hover:text-white">
                 {item.digit}
@@ -213,10 +209,10 @@ export const Dialpad: React.FC<DialpadProps> = ({
         })}
       </div>
 
-      {/* Dual SIM Call Buttons Bar - STRICTLY dir="ltr" (Vodafone on Left, Orange on Right) */}
+      {/* Dual SIM Call Buttons Bar - STRICTLY dir="ltr" (Vodafone on Left, Orange on Right - Frame 00:03!) */}
       <div
         dir="ltr"
-        className="flex items-center justify-center gap-4 sm:gap-5 mt-4 pt-1 w-full max-w-[340px] sm:max-w-[360px] mx-auto shrink-0"
+        className="flex items-center justify-center gap-4 sm:gap-5 mt-3 pt-1 w-full max-w-[340px] sm:max-w-[360px] mx-auto shrink-0"
       >
         {/* SIM 1: Vodafone */}
         <button

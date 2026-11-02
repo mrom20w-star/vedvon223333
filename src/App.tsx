@@ -130,30 +130,34 @@ export default function App() {
 
     setTimeout(() => {
       setIsUssdRunning(false);
+      setDialedNumber('');
+
       const next = handleUssdNextStep(curr, reply);
       if (next.dialogState) {
         setUssdDialogState(next.dialogState);
       }
       if (next.smsReceipt) {
-        setSmsReceipt(next.smsReceipt);
-        setCurrentTab('recents');
-        setDialedNumber('');
+        const receipt = next.smsReceipt;
+        // Realistic network delay of 1.8s ("بعديها بثانية أو ثانيتين")
+        setTimeout(() => {
+          setSmsReceipt(receipt);
 
-        // Also add to recents call log
-        const amount = curr.amount || 500;
-        const phone = curr.targetPhone || '01095612011';
-        const newLog: CallLog = {
-          id: `ussd-${Date.now()}`,
-          phone: `*9*7*${phone}*${amount}#`,
-          sim: curr.sim,
-          type: 'ussd',
-          timestamp: Date.now(),
-          ussdSummary: `تحويل ${amount} جنيه لرقم ${phone}`,
-          amount,
-        };
-        setCallLogs((prev) => [newLog, ...prev]);
+          // Also add to recents call log
+          const amount = curr.amount || 500;
+          const phone = curr.targetPhone || '01095612011';
+          const newLog: CallLog = {
+            id: `ussd-${Date.now()}`,
+            phone: `*9*7*${phone}*${amount}#`,
+            sim: curr.sim,
+            type: 'ussd',
+            timestamp: Date.now(),
+            ussdSummary: `تحويل ${amount} جنيه لرقم ${phone}`,
+            amount,
+          };
+          setCallLogs((prev) => [newLog, ...prev]);
+        }, 1800);
       }
-    }, 1600);
+    }, 1200);
   };
 
   // Contact CRUD
@@ -239,6 +243,7 @@ export default function App() {
               }
             }}
             onClearLogs={() => setCallLogs([])}
+            onGoToKeypad={() => setCurrentTab('keypad')}
             lang={lang}
           />
         )}

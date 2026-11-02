@@ -120,8 +120,14 @@ export function handleUssdNextStep(
   if (session.type === 'vf_cash_transfer') {
     const phone = session.targetPhone || '01095612011';
     const amount = session.amount || 500;
-    // Produces the exact SMS shown in video at 01:17:
     return {
+      dialogState: {
+        isOpen: true,
+        title: 'Phone',
+        message: `تم تحويل ${amount} جنيه لرقم ${phone} بنجاح.\nمصاريف الخدمة 1 جنيه.`,
+        inputPrompt: false,
+        sim: currentState.sim,
+      },
       smsReceipt: {
         isOpen: true,
         sender: 'VF-Cash',

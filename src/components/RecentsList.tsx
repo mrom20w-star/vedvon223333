@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, ArrowUpRight, DollarSign, Info, MoreVertical, Trash2 } from 'lucide-react';
+import { Search, Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, ArrowUpRight, DollarSign, Info, MoreVertical, Trash2, Grid } from 'lucide-react';
 import { CallLog, Contact } from '../types';
 
 interface RecentsListProps {
@@ -9,6 +9,7 @@ interface RecentsListProps {
   onOpenContactDetails: (contact: Contact) => void;
   onOpenNumberDetails: (phone: string, name?: string) => void;
   onClearLogs: () => void;
+  onGoToKeypad?: () => void;
   lang?: 'ar' | 'en';
 }
 
@@ -19,6 +20,7 @@ export const RecentsList: React.FC<RecentsListProps> = ({
   onOpenContactDetails,
   onOpenNumberDetails,
   onClearLogs,
+  onGoToKeypad,
   lang = 'ar',
 }) => {
   const [filter, setFilter] = useState<'all' | 'missed' | 'cash'>('all');
@@ -62,8 +64,8 @@ export const RecentsList: React.FC<RecentsListProps> = ({
       {/* Header */}
       <div className="px-5 pt-3 pb-2">
         <div className="flex items-center justify-between mb-2 relative">
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            {isRtl ? 'سجل المكالمات' : 'Phone'}
+          <h1 className="text-3xl font-bold tracking-tight text-white font-sans">
+            Phone
           </h1>
           <div className="flex items-center gap-2">
             <button
@@ -251,6 +253,17 @@ export const RecentsList: React.FC<RecentsListProps> = ({
           })
         )}
       </div>
+
+      {/* Floating Green Dialpad Button matching frame 01:21! */}
+      {onGoToKeypad && (
+        <button
+          onClick={onGoToKeypad}
+          title="Open Keypad"
+          className="absolute bottom-5 right-5 w-13 h-13 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-2xl flex items-center justify-center transition-all cursor-pointer z-30"
+        >
+          <Grid className="w-6 h-6 stroke-[2]" />
+        </button>
+      )}
     </div>
   );
 };

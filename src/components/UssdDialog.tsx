@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, MessageSquare, ExternalLink, X } from 'lucide-react';
+import { Loader2, ExternalLink, X, ChevronDown } from 'lucide-react';
 import { UssdDialogState, SmsReceiptState } from '../types';
 import { phoneSound } from '../utils/audio';
 
@@ -32,7 +32,7 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
       setInputVal(dialogState.inputValue || '');
       setTimeout(() => {
         inputRef.current?.focus();
-      }, 50);
+      }, 60);
     }
   }, [dialogState]);
 
@@ -43,10 +43,17 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
     setInputVal('');
   };
 
-  // Play notification sound when SMS arrives (NO confetti!)
+  // Play notification sound when SMS arrives and setup auto-dismiss
   useEffect(() => {
     if (smsReceipt && smsReceipt.isOpen) {
       phoneSound.playNotificationTone();
+
+      // Auto dismiss notification after 9 seconds if not dismissed manually
+      const timer = setTimeout(() => {
+        onCloseReceipt();
+      }, 9000);
+
+      return () => clearTimeout(timer);
     }
   }, [smsReceipt]);
 
@@ -97,27 +104,28 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
               </form>
             )}
 
-            {/* Action buttons: Cancel on Left, Send on Right as in video frame 01:07! */}
+            {/* Action buttons: Cancel & Send when inputPrompt, or single OK button when info/success */}
             <div className="flex items-center justify-end gap-5 pt-1 text-sm font-semibold tracking-wide">
-              <button
-                type="button"
-                onClick={() => {
-                  phoneSound.playTapClick();
-                  onCancel();
-                }}
-                className="text-zinc-300 hover:text-white active:scale-95 transition-transform cursor-pointer py-1 px-2"
-              >
-                Cancel
-              </button>
-
               {dialogState.inputPrompt ? (
-                <button
-                  type="button"
-                  onClick={() => handleSubmit()}
-                  className="text-emerald-400 hover:text-emerald-300 active:scale-95 transition-transform cursor-pointer font-bold py-1 px-2"
-                >
-                  Send
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      phoneSound.playTapClick();
+                      onCancel();
+                    }}
+                    className="text-zinc-300 hover:text-white active:scale-95 transition-transform cursor-pointer py-1 px-2"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSubmit()}
+                    className="text-emerald-400 hover:text-emerald-300 active:scale-95 transition-transform cursor-pointer font-bold py-1 px-2"
+                  >
+                    Send
+                  </button>
+                </>
               ) : (
                 <button
                   type="button"
@@ -135,52 +143,58 @@ export const UssdDialog: React.FC<UssdDialogProps> = ({
         </div>
       )}
 
-      {/* 3. Authentic Android Heads-Up Push Notification Card (Exact match of frame 01:17!) */}
+      {/* 3. Authentic Android Heads-Up Push Notification Card (Exact match of frame 01:17 in video!) */}
       {smsReceipt && smsReceipt.isOpen && (
         <div
-          className="fixed top-3 left-3 right-3 max-w-[370px] mx-auto z-50 animate-slide-down select-none pointer-events-auto"
+          className="fixed top-2.5 left-2.5 right-2.5 max-w-[370px] mx-auto z-50 animate-slide-down select-none pointer-events-auto"
           dir={isRtl ? 'rtl' : 'ltr'}
         >
-          {/* Notification Banner Container */}
-          <div className="w-full bg-[#202124] border border-zinc-700/70 rounded-2xl shadow-2xl p-4 text-white flex flex-col gap-2.5 backdrop-blur-md">
-            {/* Notification Header */}
+          {/* Notification Card Container */}
+          <div className="w-full bg-[#1e1f23] border border-[#333539] rounded-2xl shadow-2xl p-3.5 text-white flex flex-col gap-2 backdrop-blur-md transition-all">
+            {/* Top Row: App Icon + App Name (VF-Cash) + Time + Chevron */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-white shadow-xs shrink-0">
-                  <MessageSquare className="w-3.5 h-3.5 fill-current" />
+                {/* Red Vodafone Cash App Icon */}
+                <div className="w-5 h-5 rounded-md bg-[#e60000] flex items-center justify-center text-white shadow-xs shrink-0">
+                  <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
+                  </svg>
                 </div>
                 <span className="font-bold text-[13px] text-white tracking-wide">
                   {smsReceipt.sender}
                 </span>
-                <span className="text-[10px] text-zinc-400">
+                <span className="text-[10px] text-zinc-400 ms-1">
                   {isRtl ? 'الآن' : 'now'}
                 </span>
               </div>
 
-              <button
-                onClick={() => {
-                  phoneSound.playTapClick();
-                  onCloseReceipt();
-                }}
-                className="p-1 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
-                title={isRtl ? 'إغلاق الإشعار' : 'Dismiss'}
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1.5">
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                <button
+                  onClick={() => {
+                    phoneSound.playTapClick();
+                    onCloseReceipt();
+                  }}
+                  className="p-1 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
+                  title={isRtl ? 'إغلاق الإشعار' : 'Dismiss'}
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
 
-            {/* Notification Message Body (Frame 01:17: fee is 1 EGP!) */}
-            <div className="text-[12.5px] text-zinc-200 leading-relaxed whitespace-pre-line font-sans px-0.5">
+            {/* Notification Body Text (Frame 01:17: fee is 1 EGP!) */}
+            <div className="text-[12.5px] text-zinc-100 leading-relaxed whitespace-pre-line font-sans px-0.5">
               {smsReceipt.body}
             </div>
 
-            {/* Link if present (http://vf.eg/vfcash) */}
+            {/* Blue URL link (http://vf.eg/vfcash) */}
             {smsReceipt.url && (
               <a
                 href={smsReceipt.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1.5 underline px-0.5 pt-0.5"
+                className="text-xs text-[#4d8bf8] hover:text-[#6ba1ff] flex items-center gap-1.5 underline px-0.5"
                 dir="ltr"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
