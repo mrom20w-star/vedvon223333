@@ -1,0 +1,6 @@
+{
+  "name": "Phone & Contacts - هاتف وجهات الاتصال",
+  "description": "تطبيق هاتف وجهات اتصال متكامل بتصميم أندرويد دقيق مع دعم الشريحتين فودافون وأورنج وأكواد USSD وخدمات فودافون كاش",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
