@@ -125,7 +125,7 @@ export function handleUssdNextStep(
       smsReceipt: {
         isOpen: true,
         sender: 'VF-Cash',
-        body: `تم تحويل ${amount} جنيه لرقم ${phone}\nمصاريف الخدمة 10 جنيه`,
+        body: `تم تحويل ${amount} جنيه لرقم ${phone}\nمصاريف الخدمة 1 جنيه`,
         url: 'http://vf.eg/vfcash',
         timestamp: Date.now(),
       },

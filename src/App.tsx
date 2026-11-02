@@ -153,7 +153,7 @@ export default function App() {
         };
         setCallLogs((prev) => [newLog, ...prev]);
       }
-    }, 900);
+    }, 1600);
   };
 
   // Contact CRUD

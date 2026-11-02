@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { UserPlus, UserCheck, MessageSquare, Delete } from 'lucide-react';
 import { phoneSound } from '../utils/audio';
 
@@ -43,6 +43,14 @@ export const Dialpad: React.FC<DialpadProps> = ({
   lang = 'ar',
 }) => {
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const numberScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll dialed number container to the right (end) on new input so it never wraps
+  useEffect(() => {
+    if (numberScrollRef.current) {
+      numberScrollRef.current.scrollLeft = numberScrollRef.current.scrollWidth;
+    }
+  }, [dialedNumber]);
 
   const handleDigitPress = (digit: string) => {
     phoneSound.playDtmf(digit);
@@ -77,19 +85,35 @@ export const Dialpad: React.FC<DialpadProps> = ({
 
   const isRtl = lang === 'ar';
 
+  // Dynamic font size: keeps digits strictly in ONE single horizontal line, never breaking into two lines
+  const getFontSize = () => {
+    if (dialedNumber.length > 22) return 'text-xl';
+    if (dialedNumber.length > 16) return 'text-2xl';
+    if (dialedNumber.length > 12) return 'text-3xl';
+    return 'text-3xl sm:text-4xl';
+  };
+
   return (
-    <div className="flex flex-col flex-1 justify-between px-6 pb-6 pt-4 select-none max-w-md mx-auto w-full">
+    <div className="flex flex-col flex-1 justify-between px-6 pb-6 pt-8 select-none max-w-md mx-auto w-full">
       {/* Top Number Display Area */}
-      <div className="flex flex-col items-center justify-center min-h-[110px] w-full">
-        <div className="relative w-full flex items-center justify-center min-h-[52px] mb-2">
+      <div className="flex flex-col items-center justify-center min-h-[120px] w-full shrink-0">
+        <div className="relative w-full flex items-center justify-center min-h-[56px] mb-2">
           {dialedNumber ? (
-            <>
-              <span
-                className="text-white text-3xl sm:text-4xl font-light tracking-wider text-center px-10 break-all max-h-24 overflow-y-auto"
+            <div className="w-full flex items-center justify-center relative">
+              {/* Strictly ONE line (whitespace-nowrap) with smooth horizontal auto-scroll */}
+              <div
+                ref={numberScrollRef}
+                className="w-full text-center px-12 overflow-x-auto no-scrollbar scroll-smooth"
                 dir="ltr"
               >
-                {dialedNumber}
-              </span>
+                <span
+                  className={`text-white font-light tracking-wider inline-block whitespace-nowrap ${getFontSize()}`}
+                >
+                  {dialedNumber}
+                </span>
+              </div>
+
+              {/* Backspace Button on the right */}
               <button
                 onClick={handleBackspace}
                 onContextMenu={(e) => {
@@ -97,11 +121,11 @@ export const Dialpad: React.FC<DialpadProps> = ({
                   handleClearAll();
                 }}
                 title={isRtl ? 'حذف (اضغط مطولاً للمسح بالكامل)' : 'Backspace (hold to clear)'}
-                className="absolute right-0 p-2 text-zinc-400 hover:text-white active:scale-90 transition-transform cursor-pointer"
+                className="absolute right-0 p-2 text-zinc-400 hover:text-white active:scale-90 transition-transform cursor-pointer shrink-0 z-10"
               >
                 <Delete className="w-7 h-7 stroke-[1.8]" />
               </button>
-            </>
+            </div>
           ) : (
             <span className="text-zinc-600 text-sm font-medium tracking-wide">
               {isRtl ? 'اطلب رقماً أو كود USSD...' : 'Enter number or USSD code...'}
@@ -110,7 +134,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
         </div>
 
         {/* 3 Quick Action Buttons beneath the dialed number (ALWAYS VISIBLE as in video!) */}
-        <div className="flex items-center justify-center gap-7 sm:gap-9 mt-1 text-zinc-300 w-full">
+        <div className="flex items-center justify-center gap-7 sm:gap-9 mt-2 text-zinc-300 w-full">
           {/* 1. Create new contact */}
           <button
             onClick={() => onCreateContact(dialedNumber)}
@@ -137,7 +161,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
             </span>
           </button>
 
-          {/* 3. Send message (صف الرسائل المطلوب) */}
+          {/* 3. Send message */}
           <button
             onClick={() => onSendMessage(dialedNumber)}
             className="flex flex-col items-center gap-1 group cursor-pointer hover:text-white transition-colors"
@@ -152,10 +176,10 @@ export const Dialpad: React.FC<DialpadProps> = ({
         </div>
       </div>
 
-      {/* Dialpad 3x4 Grid - STRICTLY dir="ltr" so 1 is LEFT, 2 is MIDDLE, 3 is RIGHT */}
+      {/* Dialpad 3x4 Grid - LOWERED DOWN (نزله سنة) towards call buttons, strictly LTR (1 on left, 3 on right) */}
       <div
         dir="ltr"
-        className="grid grid-cols-3 gap-y-4 gap-x-6 sm:gap-x-8 max-w-[340px] sm:max-w-[360px] mx-auto w-full my-auto"
+        className="grid grid-cols-3 gap-y-4 gap-x-6 sm:gap-x-8 max-w-[340px] sm:max-w-[360px] mx-auto w-full mt-auto mb-2"
       >
         {BUTTONS.map((item) => {
           const isZero = item.digit === '0';
@@ -192,7 +216,7 @@ export const Dialpad: React.FC<DialpadProps> = ({
       {/* Dual SIM Call Buttons Bar - STRICTLY dir="ltr" (Vodafone on Left, Orange on Right) */}
       <div
         dir="ltr"
-        className="flex items-center justify-center gap-4 sm:gap-5 mt-5 pt-2 w-full max-w-[340px] sm:max-w-[360px] mx-auto"
+        className="flex items-center justify-center gap-4 sm:gap-5 mt-4 pt-1 w-full max-w-[340px] sm:max-w-[360px] mx-auto shrink-0"
       >
         {/* SIM 1: Vodafone */}
         <button
